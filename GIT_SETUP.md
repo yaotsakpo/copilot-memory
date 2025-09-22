@@ -1,8 +1,8 @@
 # 🚀 Git Repository Setup & Push Guide
 
 ## 📊 Current Status
-✅ **Git Repository Initialized**  
-✅ **Initial Commit Created** (c8249b4)  
+✅ **Git Repository Initialized**
+✅ **Initial Commit Created** (c8249b4)
 ✅ **18 Files Committed** (Ready to push!)
 
 ## 🌐 Push Options
@@ -31,7 +31,7 @@ git push -u origin main
 After creating the repo, update the repository URLs in `package.json`:
 ```json
 "repository": {
-  "type": "git", 
+  "type": "git",
   "url": "https://github.com/YOUR_USERNAME/copilot-memory.git"
 },
 "bugs": {
@@ -55,7 +55,7 @@ git push -u origin main
 
 #### **Create Bitbucket Repository**
 ```bash
-# Add Bitbucket remote  
+# Add Bitbucket remote
 git remote add origin https://bitbucket.org/YOUR_USERNAME/copilot-memory.git
 
 # Push to Bitbucket
