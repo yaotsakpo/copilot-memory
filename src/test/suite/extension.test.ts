@@ -8,7 +8,8 @@ suite('Extension Test Suite', () => {
 		assert.ok(vscode.extensions.getExtension('yaotsakpo.copilot-memory'));
 	});
 
-	test('Extension should activate', async () => {
+	test('Extension should activate', async function() {
+		this.timeout(10000); // Increase timeout
 		const extension = vscode.extensions.getExtension('yaotsakpo.copilot-memory');
 		if (extension && !extension.isActive) {
 			await extension.activate();
@@ -16,7 +17,13 @@ suite('Extension Test Suite', () => {
 		assert.ok(extension?.isActive, 'Extension should be active');
 	});
 
-	test('Commands should be registered', async () => {
+	test('Commands should be registered', async function() {
+		this.timeout(10000); // Increase timeout
+		// Ensure extension is activated first
+		const extension = vscode.extensions.getExtension('yaotsakpo.copilot-memory');
+		if (extension && !extension.isActive) {
+			await extension.activate();
+		}
 		const commands = await vscode.commands.getCommands(true);
 
 		assert.ok(

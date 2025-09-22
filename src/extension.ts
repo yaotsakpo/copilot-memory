@@ -45,7 +45,7 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
         Logger.info('Copilot Memory extension activated successfully');
-        
+
         // Export API for other extensions
         return extensionAPI;
     } catch (error) {

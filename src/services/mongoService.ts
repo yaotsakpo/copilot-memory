@@ -146,16 +146,11 @@ export class MongoService {
             };
         }
 
-        const readyStates: Record<number, string> = {
-            [0]: 'disconnected',
-            [1]: 'connected',
-            [2]: 'connecting',
-            [3]: 'disconnecting'
-        };
+        const readyStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
 
         return {
             isConnected: this.connection.readyState === 1,
-            readyState: readyStates[this.connection.readyState as keyof typeof readyStates] || 'unknown',
+            readyState: readyStates[this.connection.readyState] || 'unknown',
             // Note: Mongoose doesn't expose pool statistics directly
             // These would need to be tracked separately if needed
         };
