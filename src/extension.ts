@@ -2,10 +2,23 @@ import * as vscode from 'vscode';
 import { RuleManager } from './ruleManager';
 import { CopilotInterceptor } from './copilotInterceptor';
 
+// Extension constants
+const EXTENSION_NAME = 'Copilot Memory';
+const COMMAND_PREFIX = 'copilotMemory';
+
+// Global instances
 let ruleManager: RuleManager;
 let copilotInterceptor: CopilotInterceptor;
 
-export async function activate(context: vscode.ExtensionContext) {
+/**
+ * Activates the Copilot Memory extension.
+ * 
+ * Initializes the rule manager and Copilot interceptor, then registers
+ * all extension commands for managing coding rules and preferences.
+ * 
+ * @param context - The VS Code extension context
+ */
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
     console.log('Copilot Memory extension is now active!');
 
     // Initialize rule manager

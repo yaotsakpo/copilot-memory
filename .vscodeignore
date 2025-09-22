@@ -15,9 +15,8 @@ src/**
 node_modules/**
 
 # Documentation (keep only README in package)
-DEPLOYMENT.md
-GIT_SETUP.md
 .copilot-memory.example.json
+assets/README.md
 
 # Build artifacts
 *.log
