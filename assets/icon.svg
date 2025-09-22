@@ -1,0 +1,23 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="64" cy="64" r="60" fill="#2D2D30" stroke="#007ACC" stroke-width="4"/>
+
+  <!-- Brain Shape (Memory concept) -->
+  <path d="M40 45 C35 40, 45 35, 55 40 C60 35, 70 35, 75 40 C85 35, 95 40, 90 50 C95 55, 90 65, 85 70 C90 75, 85 85, 75 80 C70 85, 60 85, 55 80 C45 85, 35 80, 40 70 C35 65, 40 55, 40 45 Z" fill="#4FC3F7" opacity="0.8"/>
+
+  <!-- Memory Chips/Database Icons -->
+  <rect x="45" y="50" width="8" height="12" rx="2" fill="#FFD54F"/>
+  <rect x="58" y="48" width="8" height="14" rx="2" fill="#FFD54F"/>
+  <rect x="71" y="52" width="8" height="10" rx="2" fill="#FFD54F"/>
+
+  <!-- Copilot Wing -->
+  <path d="M75 65 Q85 60, 90 70 Q85 75, 75 72 Z" fill="#81C784" opacity="0.9"/>
+
+  <!-- Connection Lines (Neural Network) -->
+  <line x1="50" y1="58" x2="62" y2="58" stroke="#007ACC" stroke-width="2" opacity="0.6"/>
+  <line x1="66" y1="58" x2="75" y2="58" stroke="#007ACC" stroke-width="2" opacity="0.6"/>
+  <line x1="58" y1="52" x2="58" y2="68" stroke="#007ACC" stroke-width="2" opacity="0.6"/>
+
+  <!-- GitHub Copilot "Co" text -->
+  <text x="64" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">Memory</text>
+</svg>
