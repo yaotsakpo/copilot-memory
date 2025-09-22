@@ -12,10 +12,10 @@ let copilotInterceptor: CopilotInterceptor;
 
 /**
  * Activates the Copilot Memory extension.
- * 
+ *
  * Initializes the rule manager and Copilot interceptor, then registers
  * all extension commands for managing coding rules and preferences.
- * 
+ *
  * @param context - The VS Code extension context
  */
 export async function activate(context: vscode.ExtensionContext): Promise<void> {

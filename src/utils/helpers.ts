@@ -22,7 +22,7 @@ export function getWorkspaceRoot(): string | undefined {
  * Show an error message with optional actions
  */
 export async function showErrorMessage(
-    message: string, 
+    message: string,
     ...actions: string[]
 ): Promise<string | undefined> {
     return vscode.window.showErrorMessage(message, ...actions);
@@ -32,7 +32,7 @@ export async function showErrorMessage(
  * Show an information message with optional actions
  */
 export async function showInformationMessage(
-    message: string, 
+    message: string,
     ...actions: string[]
 ): Promise<string | undefined> {
     return vscode.window.showInformationMessage(message, ...actions);
@@ -45,11 +45,11 @@ export function validateRuleText(text: string): { isValid: boolean; error?: stri
     if (!text || text.trim().length === 0) {
         return { isValid: false, error: 'Rule text cannot be empty' };
     }
-    
+
     if (text.length > 500) {
         return { isValid: false, error: 'Rule text must be less than 500 characters' };
     }
-    
+
     return { isValid: true };
 }
 
