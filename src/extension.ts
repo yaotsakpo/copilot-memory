@@ -26,11 +26,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Initialize RuleManager with context
         const ruleManager = new RuleManager(context);
-        await ruleManager.initialize();
-
-        // Initialize and register all commands
+        
+        // Always register commands first, even if initialization fails
         const commandRegistry = new CommandRegistry(ruleManager);
         commandRegistry.registerCommands(context);
+
+        // Initialize RuleManager (this might fail, but commands are already registered)
+        try {
+            await ruleManager.initialize();
+        } catch (error) {
+            Logger.error('RuleManager initialization failed, but extension will continue with limited functionality', error as Error);
+            vscode.window.showWarningMessage('Copilot Memory: Database connection failed. Extension will use local storage fallback.');
+        }
 
         // Create and expose public API
         const packageJson = require('../package.json');
@@ -50,7 +57,19 @@ export async function activate(context: vscode.ExtensionContext) {
         return extensionAPI;
     } catch (error) {
         Logger.error('Failed to activate Copilot Memory extension', error as Error);
-        vscode.window.showErrorMessage('Failed to activate Copilot Memory extension. Please check the logs for details.');
+        vscode.window.showErrorMessage(`Failed to activate Copilot Memory extension: ${error}. Please check the logs for details.`);
+        
+        // Still try to register commands in case of activation failure
+        try {
+            const ruleManager = new RuleManager(context);
+            const commandRegistry = new CommandRegistry(ruleManager);
+            commandRegistry.registerCommands(context);
+            Logger.info('Commands registered despite activation failure');
+        } catch (fallbackError) {
+            Logger.error('Failed to register commands in fallback', fallbackError as Error);
+        }
+        
+        throw error; // Re-throw to ensure VS Code knows activation failed
     }
 }
 

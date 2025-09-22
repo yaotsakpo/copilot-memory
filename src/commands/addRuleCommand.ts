@@ -15,6 +15,11 @@ export class AddRuleCommandHandler {
      */
     async execute(): Promise<void> {
         try {
+            // Ensure RuleManager is initialized
+            if (!this.ruleManager) {
+                vscode.window.showErrorMessage('Copilot Memory is not properly initialized. Please restart VS Code.');
+                return;
+            }
             // Get rule text from user
             const ruleText = await this.getRuleTextFromUser();
             if (!ruleText) {
