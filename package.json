@@ -1,10 +1,14 @@
 {
   "name": "copilot-memory",
   "displayName": "Copilot Memory",
-  "description": "A personalization layer that adds persistent rules and preferences on top of GitHub Copilot",
+  "description": "Train GitHub Copilot to remember your coding preferences with persistent rules and personalized AI suggestions",
   "version": "0.0.1",
-  "publisher": "copilot-memory",
+  "publisher": "yaotsakpo",
   "license": "MIT",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/yaotsakpo/copilot-memory.git"
@@ -15,15 +19,21 @@
   "homepage": "https://github.com/yaotsakpo/copilot-memory#readme",
   "keywords": [
     "copilot",
+    "github-copilot",
     "ai",
+    "artificial-intelligence",
+    "code-completion",
     "rules",
     "personalization",
-    "coding-assistant"
+    "coding-assistant",
+    "productivity",
+    "developer-tools"
   ],
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
+    "Machine Learning",
     "Other"
   ],
   "activationEvents": [
