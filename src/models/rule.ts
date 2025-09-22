@@ -11,7 +11,7 @@ export interface IRule extends Document {
     isActive: boolean;
 }
 
-const RuleSchema: Schema = new Schema({
+const RULE_SCHEMA: Schema = new Schema({
     ruleId: {
         type: String,
         required: true,
@@ -43,8 +43,8 @@ const RuleSchema: Schema = new Schema({
 });
 
 // Create compound indexes for efficient querying
-RuleSchema.index({ scope: 1, isActive: 1 });
-RuleSchema.index({ scope: 1, languageScope: 1, isActive: 1 });
-RuleSchema.index({ scope: 1, projectPath: 1, isActive: 1 });
+RULE_SCHEMA.index({ scope: 1, isActive: 1 });
+RULE_SCHEMA.index({ scope: 1, languageScope: 1, isActive: 1 });
+RULE_SCHEMA.index({ scope: 1, projectPath: 1, isActive: 1 });
 
-export const Rule = mongoose.model<IRule>('Rule', RuleSchema);
+export const RULE_MODEL = mongoose.model<IRule>('Rule', RULE_SCHEMA);
