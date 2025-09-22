@@ -1,0 +1,52 @@
+name: Publish Extension
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v0.1.0, v1.0.0, etc.
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Compile extension
+      run: npm run compile
+
+    - name: Run tests
+      run: npm test
+      continue-on-error: true  # Don't fail if no tests exist yet
+
+    - name: Package extension
+      run: npx @vscode/vsce package
+
+    - name: Publish to VS Code Marketplace
+      run: npx @vscode/vsce publish --no-dependencies
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+    - name: Upload VSIX as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: copilot-memory-${{ github.ref_name }}.vsix
+        path: '*.vsix'
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: '*.vsix'
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

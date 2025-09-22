@@ -20,7 +20,7 @@ We love your input! We want to make contributing to Copilot Memory as easy and t
 ## 📋 Development Setup
 
 ### Prerequisites
-- Node.js 16+ 
+- Node.js 16+
 - VS Code
 - Git
 
@@ -79,7 +79,7 @@ We use GitHub issues to track feature requests. Please:
 1. **Create a feature branch**: `git checkout -b feature/your-feature-name`
 2. **Make your changes** with clear, atomic commits
 3. **Update documentation** if needed
-4. **Test thoroughly** 
+4. **Test thoroughly**
 5. **Update CHANGELOG.md** with your changes
 6. **Submit a pull request** with a clear description
 
@@ -115,7 +115,7 @@ We use GitHub issues to track feature requests. Please:
 copilot-memory/
 ├── src/
 │   ├── extension.ts           # Main extension entry point
-│   ├── ruleManager.ts         # Rule CRUD operations  
+│   ├── ruleManager.ts         # Rule CRUD operations
 │   ├── copilotInterceptor.ts  # Copilot integration
 │   └── models/
 │       └── rule.ts           # Rule data model

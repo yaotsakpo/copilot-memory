@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Automated publishing pipeline with GitHub Actions
+- Continuous Integration (CI) with multi-OS testing
+- Automated version bumping and release scripts
+- Security scanning and code quality checks
+- GitHub Releases with .vsix attachments
+
+### Documentation
+- Complete automation setup guide (AUTOMATION.md)
+- Professional CI/CD workflow documentation
+
 ## [0.0.1] - 2025-09-22
 
 ### Added

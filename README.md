@@ -5,7 +5,7 @@
 [![GitHub Stars](https://img.shields.io/github/stars/yaotsakpo/copilot-memory)](https://github.com/yaotsakpo/copilot-memory)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Train GitHub Copilot to remember your coding preferences!** 
+**Train GitHub Copilot to remember your coding preferences!**
 
 Copilot Memory is a VS Code extension that adds a personalization layer to GitHub Copilot, allowing you to define persistent coding rules that enhance AI suggestions according to your standards and preferences.
 
@@ -53,7 +53,7 @@ Copilot Memory is a VS Code extension that adds a personalization layer to GitHu
 ### 3. Project-Specific Rules
 
 1. In your project workspace
-2. `Copilot Memory: Add Rule` 
+2. `Copilot Memory: Add Rule`
 3. Enter: *"Use our custom Logger class instead of console.log"*
 4. Choose scope: **Project** (applies only to this workspace)
 
@@ -64,7 +64,7 @@ Copilot Memory is a VS Code extension that adds a personalization layer to GitHu
 - *"Prefer arrow functions over function declarations for callbacks"*
 - *"Use template literals instead of string concatenation"*
 
-### Framework-Specific Rules  
+### Framework-Specific Rules
 - *"Use React hooks instead of class components"*
 - *"Prefer Composition API over Options API in Vue 3"*
 - *"Use async/await with try-catch for error handling in Node.js"*
