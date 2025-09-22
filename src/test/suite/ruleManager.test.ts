@@ -9,20 +9,35 @@ suite('RuleManager Test Suite', () => {
 	let mockContext: vscode.ExtensionContext;
 
 	setup(async function() {
-		this.timeout(10000); // Increase timeout
+		this.timeout(5000); // Reduce timeout
 		// Create a minimal mock extension context
 		mockContext = {
 			subscriptions: [],
 			globalStorageUri: vscode.Uri.file('/tmp/test-storage'),
 		} as any;
 
+		// Mock the configuration to avoid MongoDB in tests
+		const mockConfig = {
+			get: (key: string) => {
+				if (key === 'mongodbUri') {
+					return undefined;
+				}
+				if (key === 'fallbackToLocal') {
+					return true;
+				}
+				return undefined;
+			}
+		};
+		
+		// Override workspace configuration for tests
+		const originalGetConfiguration = vscode.workspace.getConfiguration;
+		vscode.workspace.getConfiguration = () => mockConfig as any;
+
 		ruleManager = new RuleManager(mockContext);
-		try {
-			await ruleManager.initialize();
-		} catch (error) {
-			// If MongoDB fails, that's OK for tests
-			console.log('MongoDB connection failed in tests, continuing with local storage');
-		}
+		await ruleManager.initialize();
+		
+		// Restore original configuration
+		vscode.workspace.getConfiguration = originalGetConfiguration;
 	});
 
 	test('should initialize successfully', () => {

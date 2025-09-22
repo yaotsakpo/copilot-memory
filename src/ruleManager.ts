@@ -45,7 +45,7 @@ export class RuleManager {
         const mongoUri = config.mongodbUri;
 
         // Try to connect to MongoDB first
-        if (mongoUri) {
+        if (mongoUri && mongoUri !== 'mongodb://localhost:27017/copilot-memory') {
             try {
                 await this.connectToMongoDB(mongoUri);
                 Logger.info('Connected to MongoDB');
@@ -55,6 +55,8 @@ export class RuleManager {
                     throw new Error('MongoDB connection failed and fallback is disabled');
                 }
             }
+        } else {
+            Logger.info('Skipping MongoDB connection (using default/test URI)');
         }
 
         // Load rules from appropriate source
