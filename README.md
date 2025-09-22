@@ -1,16 +1,14 @@
 # Copilot Memory
 
-A personalization layer that adds persistent rules and preferences on top of GitHub Copilot.
+[![VS Code Extension](https://img.shields.io/badge/VS%20Code-Extension-blue.svg)](https://github.com/yaotsakpo/copilot-memory)
+[![TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-blue.svg)](https://www.typescriptlang.org/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 🛠 Tech Stack
+A personalization layer that adds persistent rules and preferences on top of GitHub Copilot. Train Copilot to follow your coding standards and preferences across all your projects.
 
-- **Node.js with TypeScript** for the VS Code extension
-- **MongoDB with Mongoose** for persistence (local MongoDB with cloud Atlas migration support)
-- **VS Code Extension API** for integration
+## ✨ What It Does
 
-## 🎯 Project Goal
-
-Build a VS Code extension that intercepts Copilot requests and injects custom rules before sending to Copilot. Rules are stored in MongoDB with support for different scopes (global, project, language-specific).
+Copilot Memory allows you to define custom coding rules that enhance GitHub Copilot's suggestions. Whether you want to enforce specific coding patterns, prefer certain APIs, or maintain consistency across projects, this extension helps you teach Copilot your preferences.
 
 ## 📦 Features
 

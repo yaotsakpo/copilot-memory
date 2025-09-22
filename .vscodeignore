@@ -1,17 +1,30 @@
+# Source files (TypeScript gets compiled to out/)
+src/**
+**/*.ts
+**/*.map
+
+# Development configuration
 .vscode/**
 .vscode-test/**
-src/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/*.map
-**/*.ts
-node_modules/**
-.DS_Store
 .github/**
+**/tsconfig.json
+**/.eslintrc.js
+.editorconfig
+
+# Dependencies
+node_modules/**
+
+# Documentation (keep only README in package)
+DEPLOYMENT.md
+GIT_SETUP.md
+.copilot-memory.example.json
+
+# Build artifacts
 *.log
 npm-debug.log*
-.copilot-memory.example.json
-DEPLOYMENT.md
+.gitignore
+.DS_Store
+
+# Development tools
+.yarnrc
+vsc-extension-quickstart.md

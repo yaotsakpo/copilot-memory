@@ -7,12 +7,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/copilot-memory.git"
+    "url": "https://github.com/yaotsakpo/copilot-memory.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/copilot-memory/issues"
+    "url": "https://github.com/yaotsakpo/copilot-memory/issues"
   },
-  "homepage": "https://github.com/your-username/copilot-memory#readme",
+  "homepage": "https://github.com/yaotsakpo/copilot-memory#readme",
   "keywords": [
     "copilot",
     "ai",
