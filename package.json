@@ -2,7 +2,7 @@
   "name": "copilot-memory",
   "displayName": "Copilot Memory",
   "description": "Train GitHub Copilot to remember your coding preferences with persistent rules and personalized AI suggestions",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "yaotsakpo",
   "license": "MIT",
   "icon": "assets/copilot-memory.png",
