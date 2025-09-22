@@ -2,6 +2,11 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import * as mongoose from 'mongoose';
+import { MongoService, MongoConnectionConfig } from './services/mongoService';
+import { createRuleModel, IRuleDocument } from './models/ruleSchema';
+import { Logger } from './utils/logger';
+import { ConfigValidator } from './utils/configValidator';
 
 export interface Rule {
     ruleId: string;
@@ -16,9 +21,11 @@ export interface Rule {
 
 export class RuleManager {
     private context: vscode.ExtensionContext;
-    private mongoConnection: any = null;
+    private mongoService: MongoService | null = null;
+    private ruleModel: mongoose.Model<IRuleDocument> | null = null;
     private localFilePath: string;
     private rules: Rule[] = [];
+    private fallbackToLocal: boolean;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
@@ -26,28 +33,32 @@ export class RuleManager {
             vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || context.globalStorageUri.fsPath,
             '.copilot-memory.json'
         );
+
+        // Get configuration settings
+        const config = vscode.workspace.getConfiguration('copilotMemory');
+        this.fallbackToLocal = config.get<boolean>('fallbackToLocal', true);
     }
 
     async initialize(): Promise<void> {
-        const config = vscode.workspace.getConfiguration('copilotMemory');
-        const mongoUri = config.get<string>('mongodbUri');
-        const fallbackToLocal = config.get<boolean>('fallbackToLocal', true);
+        Logger.info('RuleManager initializing...');
+        const config = ConfigValidator.getSafeConfig();
+        const mongoUri = config.mongodbUri;
 
         // Try to connect to MongoDB first
         if (mongoUri) {
             try {
                 await this.connectToMongoDB(mongoUri);
-                console.log('Connected to MongoDB');
+                Logger.info('Connected to MongoDB');
             } catch (error) {
-                console.warn('Failed to connect to MongoDB:', error);
-                if (!fallbackToLocal) {
+                Logger.error('Failed to connect to MongoDB', error as Error);
+                if (!this.fallbackToLocal) {
                     throw new Error('MongoDB connection failed and fallback is disabled');
                 }
             }
         }
 
         // Load rules from appropriate source
-        if (this.mongoConnection) {
+        if (this.mongoService?.isConnected()) {
             await this.loadRulesFromMongo();
         } else {
             await this.loadRulesFromLocal();
@@ -55,24 +66,67 @@ export class RuleManager {
     }
 
     private async connectToMongoDB(uri: string): Promise<void> {
-        // For now, we'll simulate MongoDB connection
-        // In a real implementation, you would use mongoose here
         try {
-            // const mongoose = require('mongoose');
-            // await mongoose.connect(uri);
-            // this.mongoConnection = mongoose.connection;
+            Logger.info('Connecting to MongoDB...');
 
-            // Simulated connection for now
-            this.mongoConnection = null; // Will fallback to local storage
+            const connectionConfig: MongoConnectionConfig = {
+                uri,
+                maxPoolSize: 10,
+                minPoolSize: 2,
+                maxConnecting: 2,
+                connectTimeoutMS: 10000,
+                serverSelectionTimeoutMS: 5000,
+                heartbeatFrequencyMS: 10000,
+                retryWrites: true,
+                retryReads: true
+            };
+
+            this.mongoService = MongoService.getInstance(connectionConfig, {
+                maxRetries: 3,
+                retryDelayMs: 1000,
+                exponentialBackoff: true
+            });
+
+            const connection = await this.mongoService.connect();
+            this.ruleModel = createRuleModel(connection);
+
+            Logger.info('Connected to MongoDB successfully');
         } catch (error) {
+            Logger.error('MongoDB connection failed', error as Error);
             throw error;
         }
     }
 
     private async loadRulesFromMongo(): Promise<void> {
-        // Implementation would query MongoDB using mongoose
-        // For now, fallback to local
-        await this.loadRulesFromLocal();
+        try {
+            if (!this.ruleModel) {
+                throw new Error('MongoDB model not initialized');
+            }
+
+            Logger.info('Loading rules from MongoDB...');
+            const mongoRules = await this.ruleModel.find({ isActive: true }).sort({ createdAt: -1 });
+
+            this.rules = mongoRules.map(rule => ({
+                ruleId: rule.ruleId,
+                ruleText: rule.ruleText,
+                scope: rule.scope,
+                languageScope: rule.languageScope,
+                projectPath: rule.projectPath,
+                createdAt: rule.createdAt,
+                updatedAt: rule.updatedAt,
+                isActive: rule.isActive
+            }));
+
+            Logger.info(`Loaded ${this.rules.length} rules from MongoDB`);
+        } catch (error) {
+            Logger.error('Failed to load rules from MongoDB', error as Error);
+            if (this.fallbackToLocal) {
+                Logger.info('Falling back to local storage');
+                await this.loadRulesFromLocal();
+            } else {
+                throw error;
+            }
+        }
     }
 
     private async loadRulesFromLocal(): Promise<void> {
@@ -124,9 +178,18 @@ export class RuleManager {
 
         this.rules.push(rule);
 
-        if (this.mongoConnection) {
-            // Save to MongoDB
-            // await Rule.create(rule);
+        if (this.mongoService?.isConnected() && this.ruleModel) {
+            try {
+                await this.ruleModel.create(rule);
+                Logger.info(`Saved rule ${rule.ruleId} to MongoDB`);
+            } catch (error) {
+                Logger.error('Failed to save rule to MongoDB', error as Error);
+                if (this.fallbackToLocal) {
+                    await this.saveRulesToLocal();
+                } else {
+                    throw error;
+                }
+            }
         } else {
             await this.saveRulesToLocal();
         }
@@ -135,9 +198,18 @@ export class RuleManager {
     async removeRule(ruleId: string): Promise<void> {
         this.rules = this.rules.filter(rule => rule.ruleId !== ruleId);
 
-        if (this.mongoConnection) {
-            // Remove from MongoDB
-            // await Rule.findOneAndDelete({ ruleId });
+        if (this.mongoService?.isConnected() && this.ruleModel) {
+            try {
+                await this.ruleModel.findOneAndDelete({ ruleId });
+                Logger.info(`Removed rule ${ruleId} from MongoDB`);
+            } catch (error) {
+                Logger.error('Failed to remove rule from MongoDB', error as Error);
+                if (this.fallbackToLocal) {
+                    await this.saveRulesToLocal();
+                } else {
+                    throw error;
+                }
+            }
         } else {
             await this.saveRulesToLocal();
         }
@@ -174,5 +246,36 @@ export class RuleManager {
 
         const allRules = [...globalRules, ...projectRules, ...languageRules];
         return allRules.map(rule => rule.ruleText);
+    }
+
+    /**
+     * Cleanup resources and close MongoDB connection
+     */
+    async dispose(): Promise<void> {
+        try {
+            if (this.mongoService) {
+                await this.mongoService.disconnect();
+                Logger.info('MongoDB connection closed');
+            }
+        } catch (error) {
+            Logger.error('Error during RuleManager cleanup', error as Error);
+        }
+    }
+
+    /**
+     * Get connection status and statistics
+     */
+    getConnectionInfo(): {
+        isMongoConnected: boolean;
+        fallbackEnabled: boolean;
+        totalRules: number;
+        connectionStats?: any;
+    } {
+        return {
+            isMongoConnected: this.mongoService?.isConnected() || false,
+            fallbackEnabled: this.fallbackToLocal,
+            totalRules: this.rules.length,
+            connectionStats: this.mongoService?.getConnectionStats()
+        };
     }
 }

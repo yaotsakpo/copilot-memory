@@ -1,23 +1,52 @@
 # 🧠 Copilot Memory
 
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/copilot-memory.copilot-memory)](https://marketplace.visualstudio.com/items?itemName=copilot-memory.copilot-memory)
-[![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/copilot-memory.copilot-memory)](https://marketplace.visualstudio.com/items?itemName=copilot-memory.copilot-memory)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/yaotsakpo.copilot-memory)](https://marketplace.visualstudio.com/items?itemName=yaotsakpo.copilot-memory)
+[![Visual Studio Marketplace Downl## 🛣️ Roadmap
+
+### ✅ Completed (v0.0.7 - Current)
+- ✅ **Advanced MongoDB Integration**: Connection pooling, retry logic, failover
+- ✅ **Professional Architecture**: Command pattern, dependency injection, modular design
+- ✅ **Comprehensive Testing**: Unit tests for utilities, command handlers, and core functionality
+- ✅ **Configuration Validation**: Runtime validation with detailed error messages
+- ✅ **Extension API**: Full programmatic access for third-party extensions
+- ✅ **Custom Rule Scopes**: Extensible scope system beyond global/project/language
+- ✅ **Event System**: Subscribe to rule changes and extension events
+- ✅ **Enterprise Logging**: Professional logging with output channels and log levels
+- ✅ **CI/CD Pipeline**: Automated testing, linting, and marketplace publishing
+- ✅ **Bulk Operations**: Export rules, bulk delete with confirmation
+- ✅ **Production Ready**: Error handling, resource cleanup, graceful shutdown
+
+### 🚧 Coming Soon (v0.1.0)
+- 🚧 **Visual Rule Editor**: Rich UI for managing rules with drag-drop, filtering
+- 🚧 **Rule Templates**: Pre-built rule sets for popular frameworks (React, Vue, Angular)
+- 🚧 **Team Synchronization**: Share rule sets across teams with Git integration
+- 🚧 **Rule Analytics**: Usage metrics, effectiveness tracking, rule optimization
+- 🚧 **AI Rule Suggestions**: Copilot-powered rule recommendations based on code patterns
+
+### 🔮 Future (v1.0.0+)
+- 🔮 **Cloud Service**: Managed rule synchronization across devices and teams
+- 🔮 **Machine Learning**: Personalized rule suggestions based on coding habits
+- 🔮 **IDE Integration**: Support for JetBrains IDEs, Neovim, Emacs
+- 🔮 **Enterprise Features**: SAML/SSO, audit logs, compliance reporting
+- 🔮 **Rule Marketplace**: Community-driven rule sharing and discoveryhields.io/visual-studio-marketplace/d/yaotsakpo.copilot-memory)](https://marketplace.visualstudio.com/items?itemName=yaotsakpo.copilot-memory)
 [![GitHub Stars](https://img.shields.io/github/stars/yaotsakpo/copilot-memory)](https://github.com/yaotsakpo/copilot-memory)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![CI/CD](https://github.com/yaotsakpo/copilot-memory/actions/workflows/ci.yml/badge.svg)](https://github.com/yaotsakpo/copilot-memory/actions)
 
-**Train GitHub Copilot to remember your coding preferences!**
+**Enterprise-grade personalization layer for GitHub Copilot with advanced MongoDB integration and extensible API!**
 
-Copilot Memory is a VS Code extension that adds a personalization layer to GitHub Copilot, allowing you to define persistent coding rules that enhance AI suggestions according to your standards and preferences.
+Copilot Memory is a professional VS Code extension that adds intelligent, persistent memory to GitHub Copilot. Define coding rules, preferences, and standards that are automatically applied to enhance AI suggestions according to your team's requirements.
 
-![Copilot Memory Demo](https://raw.githubusercontent.com/yaotsakpo/copilot-memory/main/assets/demo.gif)
+![Copilot Memory Demo](https://raw.githubusercontent.com/yaotsakpo/copilot-memory/main/assets/copilot-memory.png)
 
 ## 🚀 Why Copilot Memory?
 
-- 🎯 **Consistent Code Style**: Ensure Copilot suggestions match your coding standards
-- 🌐 **Global & Context-Aware Rules**: Apply rules globally, per-project, or per-language
-- 💾 **Persistent Memory**: Your preferences are saved and applied across all sessions
-- 🔄 **Smart Storage**: Cloud-ready with MongoDB support + local JSON fallback
-- ⚡ **Zero Configuration**: Works out of the box with sensible defaults
+- 🎯 **Enterprise-Ready**: Professional MongoDB connection pooling with retry logic and failover
+- 🌐 **Advanced Scoping**: Global, project, language, and custom rule scopes
+- � **Dual Storage**: MongoDB primary with intelligent local JSON fallback
+- 🔌 **Extensible API**: Full programmatic access for third-party extensions
+- ⚡ **Zero Configuration**: Works immediately with comprehensive validation
+- 🛡️ **Production-Grade**: Extensive testing, logging, error handling, and monitoring
 
 ## 📦 Installation
 
@@ -76,27 +105,159 @@ Copilot Memory is a VS Code extension that adds a personalization layer to GitHu
 
 ## 🎛️ Commands
 
-| Command | Description |
-|---------|-------------|
-| `Copilot Memory: Add Rule` | Create a new coding rule |
-| `Copilot Memory: List Rules` | View and manage existing rules |
-| `Copilot Memory: Remove Rule` | Delete a specific rule |
+| Command | Description | Shortcut |
+|---------|-------------|----------|
+| `Copilot Memory: Add Rule` | Create a new coding rule | - |
+| `Copilot Memory: List Rules` | View and manage existing rules | - |
+| `Copilot Memory: Remove Rule` | Delete a specific rule | - |
+| `Copilot Memory: Remove All Rules` | Bulk delete all rules (with confirmation) | - |
+| `Copilot Memory: Export Rules` | Export rules to JSON file | - |
+| `Copilot Memory: Show Logs` | View extension logs and diagnostics | - |
+
+## 🔌 Extension API (NEW!)
+
+Copilot Memory provides a comprehensive API for third-party extensions. Perfect for building team tools, CI/CD integrations, or custom rule management interfaces.
+
+### Getting the API
+
+```typescript
+import * as vscode from 'vscode';
+import { CopilotMemoryAPI } from './types/copilotMemoryAPI';
+
+// Get the API
+const extension = vscode.extensions.getExtension('yaotsakpo.copilot-memory');
+const api: CopilotMemoryAPI = extension?.exports;
+```
+
+### API Methods
+
+#### Rule Management
+```typescript
+// Add a rule programmatically
+const ruleId = await api.addRule(
+  'Always use TypeScript strict mode',
+  'language',
+  { languageScope: 'typescript' }
+);
+
+// Get all rules with filters
+const globalRules = await api.getRules({ scope: 'global', isActive: true });
+
+// Remove a rule
+await api.removeRule(ruleId);
+
+// Get active rules for current context
+const contextRules = await api.getActiveRulesForContext('typescript');
+```
+
+#### Custom Scopes
+```typescript
+// Register a custom scope for test files
+api.registerCustomScope('test-files', (context) => {
+  return context.filePath?.includes('.test.') ||
+         context.filePath?.includes('.spec.');
+});
+```
+
+#### Event Handling
+```typescript
+// Subscribe to rule changes
+const disposable = api.onRuleChanged(event => {
+  console.log(`Rule ${event.type}: ${event.ruleId}`);
+  if (event.type === 'added') {
+    vscode.window.showInformationMessage(`New rule added: ${event.rule?.ruleText}`);
+  }
+});
+
+// Cleanup
+disposable.dispose();
+```
+
+#### Utility Methods
+```typescript
+// Check extension capabilities
+const version = api.getVersion();
+const isConnected = api.isMongoConnected();
+
+console.log(`Copilot Memory v${version}, MongoDB: ${isConnected ? 'Connected' : 'Offline'}`);
+```
+
+### Example: Team Rules Manager Extension
+
+```typescript
+import * as vscode from 'vscode';
+import { getCopilotMemoryAPI } from './types/copilotMemoryAPI';
+
+export async function activate(context: vscode.ExtensionContext) {
+  const api = await getCopilotMemoryAPI();
+  if (!api) {
+    vscode.window.showErrorMessage('Copilot Memory is required but not installed');
+    return;
+  }
+
+  // Sync team rules from your configuration
+  const teamRules = await fetchTeamRulesFromAPI();
+  for (const rule of teamRules) {
+    await api.addRule(rule.text, rule.scope, rule.options);
+  }
+
+  // Monitor for rule changes
+  api.onRuleChanged(event => {
+    if (event.type === 'added') {
+      reportRuleUsage(event.ruleId, event.rule?.ruleText);
+    }
+  });
+}
+```
 
 ## ⚙️ Configuration
 
-Configure Copilot Memory in VS Code Settings:
+Configure Copilot Memory in VS Code Settings (`settings.json`):
 
 ```json
 {
   "copilotMemory.mongodbUri": "mongodb://localhost:27017/copilot-memory",
-  "copilotMemory.fallbackToLocal": true
+  "copilotMemory.fallbackToLocal": true,
+  "copilotMemory.maxRulesPerScope": 100,
+  "copilotMemory.enableAutoSync": false,
+  "copilotMemory.syncIntervalMinutes": 30,
+  "copilotMemory.logLevel": "info",
+  "copilotMemory.connectionTimeoutMs": 10000,
+  "copilotMemory.retryAttempts": 3
 }
 ```
 
-### Settings
+### Settings Reference
 
-- **`copilotMemory.mongodbUri`**: MongoDB connection string (optional)
-- **`copilotMemory.fallbackToLocal`**: Use local storage if MongoDB unavailable (default: `true`)
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `mongodbUri` | string | `"mongodb://localhost:27017/copilot-memory"` | MongoDB connection string with authentication support |
+| `fallbackToLocal` | boolean | `true` | Use local JSON storage when MongoDB is unavailable |
+| `maxRulesPerScope` | number | `100` | Maximum number of rules per scope (1-1000) |
+| `enableAutoSync` | boolean | `false` | Automatically sync rules between local and MongoDB |
+| `syncIntervalMinutes` | number | `30` | Auto-sync interval in minutes (5-1440) |
+| `logLevel` | string | `"info"` | Logging level: `"info"`, `"warn"`, or `"error"` |
+| `connectionTimeoutMs` | number | `10000` | MongoDB connection timeout in milliseconds |
+| `retryAttempts` | number | `3` | Number of connection retry attempts (0-10) |
+
+### MongoDB Setup
+
+#### Local Development
+```bash
+# Using Docker
+docker run -d -p 27017:27017 --name copilot-memory-db mongo:7
+
+# Using MongoDB Community Server
+brew install mongodb-community
+brew services start mongodb-community
+```
+
+#### Production (MongoDB Atlas)
+```json
+{
+  "copilotMemory.mongodbUri": "mongodb+srv://user:password@cluster.mongodb.net/copilot-memory?retryWrites=true&w=majority"
+}
+```
 
 ## � How It Works
 

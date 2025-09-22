@@ -1,147 +1,67 @@
 import * as vscode from 'vscode';
+import { CommandRegistry } from './commands/commandRegistry';
 import { RuleManager } from './ruleManager';
-import { CopilotInterceptor } from './copilotInterceptor';
-
-// Extension constants
-const EXTENSION_NAME = 'Copilot Memory';
-const COMMAND_PREFIX = 'copilotMemory';
-
-// Global instances
-let ruleManager: RuleManager;
-let copilotInterceptor: CopilotInterceptor;
+import { Logger } from './utils/logger';
+import { ConfigValidator } from './utils/configValidator';
+import { EXTENSION_CONFIG } from './constants';
+import { ExtensionAPI, CopilotMemoryAPI } from './api/extensionAPI';
 
 /**
- * Activates the Copilot Memory extension.
- *
- * Initializes the rule manager and Copilot interceptor, then registers
- * all extension commands for managing coding rules and preferences.
- *
- * @param context - The VS Code extension context
+ * This method is called when your extension is activated
+ * Your extension is activated the very first time the command is executed
  */
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
-    console.log('Copilot Memory extension is now active!');
+export async function activate(context: vscode.ExtensionContext) {
+    try {
+        Logger.info('Activating Copilot Memory extension...');
 
-    // Initialize rule manager
-    ruleManager = new RuleManager(context);
-    await ruleManager.initialize();
+        // Validate configuration
+        const configValidation = ConfigValidator.validateCurrentConfig();
+        if (!configValidation.isValid) {
+            ConfigValidator.showValidationErrors(configValidation.errors);
+            // Continue with safe defaults
+        }
 
-    // Initialize Copilot interceptor
-    copilotInterceptor = new CopilotInterceptor(ruleManager);
-    await copilotInterceptor.initialize();
+        // Start configuration watcher
+        ConfigValidator.startConfigWatcher(context);
 
-    // Register commands
-    const addRuleCommand = vscode.commands.registerCommand('copilotMemory.addRule', async () => {
-        const ruleText = await vscode.window.showInputBox({
-            prompt: 'Enter your rule',
-            placeHolder: 'e.g., Always use const instead of let for variables that are not reassigned'
+        // Initialize RuleManager with context
+        const ruleManager = new RuleManager(context);
+        await ruleManager.initialize();
+
+        // Initialize and register all commands
+        const commandRegistry = new CommandRegistry(ruleManager);
+        commandRegistry.registerCommands(context);
+
+        // Create and expose public API
+        const packageJson = require('../package.json');
+        const extensionAPI = new ExtensionAPI(ruleManager, packageJson.version);
+
+        // Store API and ruleManager in context for cleanup and external access
+        context.subscriptions.push({
+            dispose: () => {
+                extensionAPI.dispose();
+                ruleManager.dispose();
+            }
         });
 
-        if (!ruleText) {
-            return;
-        }
+        // Export API for other extensions
+        return extensionAPI;
 
-        const scope = await vscode.window.showQuickPick(
-            ['global', 'project', 'language'],
-            {
-                placeHolder: 'Select rule scope'
-            }
-        );
-
-        if (!scope) {
-            return;
-        }
-
-        let languageScope: string | undefined;
-        if (scope === 'language') {
-            const activeEditor = vscode.window.activeTextEditor;
-            if (activeEditor) {
-                languageScope = activeEditor.document.languageId;
-            } else {
-                languageScope = await vscode.window.showInputBox({
-                    prompt: 'Enter language ID',
-                    placeHolder: 'e.g., typescript, javascript, python'
-                });
-            }
-        }
-
-        try {
-            await ruleManager.addRule(ruleText, scope as 'global' | 'project' | 'language', languageScope);
-            vscode.window.showInformationMessage('Rule added successfully!');
-        } catch (error) {
-            vscode.window.showErrorMessage(`Failed to add rule: ${error}`);
-        }
-    });
-
-    const listRulesCommand = vscode.commands.registerCommand('copilotMemory.listRules', async () => {
-        try {
-            const rules = await ruleManager.getRules();
-            if (rules.length === 0) {
-                vscode.window.showInformationMessage('No rules found');
-                return;
-            }
-
-            const ruleItems = rules.map(rule => ({
-                label: `${rule.scope}: ${rule.ruleText.substring(0, 50)}...`,
-                description: rule.languageScope || '',
-                detail: rule.ruleText,
-                rule
-            }));
-
-            const selectedRule = await vscode.window.showQuickPick(ruleItems, {
-                placeHolder: 'Select a rule to view or remove'
-            });
-
-            if (selectedRule) {
-                const action = await vscode.window.showQuickPick(
-                    ['View', 'Delete'],
-                    { placeHolder: 'What would you like to do?' }
-                );
-
-                if (action === 'View') {
-                    vscode.window.showInformationMessage(selectedRule.rule.ruleText);
-                } else if (action === 'Delete') {
-                    await ruleManager.removeRule(selectedRule.rule.ruleId);
-                    vscode.window.showInformationMessage('Rule removed successfully!');
-                }
-            }
-        } catch (error) {
-            vscode.window.showErrorMessage(`Failed to list rules: ${error}`);
-        }
-    });
-
-    const removeRuleCommand = vscode.commands.registerCommand('copilotMemory.removeRule', async () => {
-        try {
-            const rules = await ruleManager.getRules();
-            if (rules.length === 0) {
-                vscode.window.showInformationMessage('No rules to remove');
-                return;
-            }
-
-            const ruleItems = rules.map(rule => ({
-                label: `${rule.scope}: ${rule.ruleText.substring(0, 50)}...`,
-                description: rule.languageScope || '',
-                detail: rule.ruleText,
-                rule
-            }));
-
-            const selectedRule = await vscode.window.showQuickPick(ruleItems, {
-                placeHolder: 'Select a rule to remove'
-            });
-
-            if (selectedRule) {
-                await ruleManager.removeRule(selectedRule.rule.ruleId);
-                vscode.window.showInformationMessage('Rule removed successfully!');
-            }
-        } catch (error) {
-            vscode.window.showErrorMessage(`Failed to remove rule: ${error}`);
-        }
-    });
-
-    context.subscriptions.push(addRuleCommand, listRulesCommand, removeRuleCommand);
+        Logger.info('Copilot Memory extension activated successfully');
+    } catch (error) {
+        Logger.error('Failed to activate Copilot Memory extension', error as Error);
+        vscode.window.showErrorMessage('Failed to activate Copilot Memory extension. Please check the logs for details.');
+    }
 }
 
+/**
+ * This method is called when your extension is deactivated
+ */
 export function deactivate() {
-    if (copilotInterceptor) {
-        copilotInterceptor.dispose();
+    try {
+        Logger.info('Deactivating Copilot Memory extension...');
+        // Cleanup resources if needed
+    } catch (error) {
+        Logger.error('Error during extension deactivation', error as Error);
     }
 }

@@ -65,12 +65,53 @@
         "copilotMemory.mongodbUri": {
           "type": "string",
           "default": "mongodb://localhost:27017/copilot-memory",
-          "description": "MongoDB connection URI"
+          "description": "MongoDB connection URI (must start with mongodb://)",
+          "pattern": "^mongodb:\\/\\/[^\\s]+$",
+          "patternErrorMessage": "Must be a valid MongoDB connection string starting with mongodb://"
         },
         "copilotMemory.fallbackToLocal": {
           "type": "boolean",
           "default": true,
           "description": "Use local .copilot-memory.json if MongoDB is unavailable"
+        },
+        "copilotMemory.maxRulesPerScope": {
+          "type": "number",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum number of rules allowed per scope (global/project/language)"
+        },
+        "copilotMemory.enableAutoSync": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically sync rules with MongoDB at regular intervals"
+        },
+        "copilotMemory.syncIntervalMinutes": {
+          "type": "number",
+          "default": 30,
+          "minimum": 5,
+          "maximum": 1440,
+          "description": "Interval in minutes for automatic synchronization (5-1440 minutes)"
+        },
+        "copilotMemory.logLevel": {
+          "type": "string",
+          "enum": ["info", "warn", "error"],
+          "default": "info",
+          "description": "Logging level for the extension"
+        },
+        "copilotMemory.connectionTimeoutMs": {
+          "type": "number",
+          "default": 10000,
+          "minimum": 1000,
+          "maximum": 60000,
+          "description": "MongoDB connection timeout in milliseconds (1000-60000)"
+        },
+        "copilotMemory.retryAttempts": {
+          "type": "number",
+          "default": 3,
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Number of retry attempts for MongoDB operations (0-10)"
         }
       }
     }
@@ -92,17 +133,19 @@
     "release:major": "npm run version:major && git push --follow-tags"
   },
   "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
     "@types/node": "20.x",
+    "@types/sinon": "^17.0.4",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
-    "@types/glob": "^8.1.0",
-    "@types/mocha": "^10.0.1",
     "@vscode/test-electron": "^2.3.4",
     "@vscode/vsce": "^2.32.0",
     "eslint": "^8.28.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
+    "sinon": "^21.0.0",
     "typescript": "^4.9.4"
   },
   "dependencies": {
