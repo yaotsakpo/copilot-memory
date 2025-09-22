@@ -255,9 +255,11 @@ brew services start mongodb-community
 #### Production (MongoDB Atlas)
 ```json
 {
-  "copilotMemory.mongodbUri": "mongodb+srv://user:password@cluster.mongodb.net/copilot-memory?retryWrites=true&w=majority"
+  "copilotMemory.mongodbUri": "mongodb+srv://<username>:<password>@<cluster>.mongodb.net/copilot-memory?retryWrites=true&w=majority"
 }
 ```
+
+> ⚠️ **Security Note**: Replace `<username>`, `<password>`, and `<cluster>` with your actual MongoDB Atlas credentials. Never commit real credentials to version control!
 
 ## � How It Works
 
