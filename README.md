@@ -21,7 +21,7 @@ Copilot Memory is a VS Code extension that adds a personalization layer to GitHu
 
 ## 📦 Installation
 
-### From VS Code Marketplace (Recommended)
+### From VS Code Marketplace (Recommended) ⭐
 
 1. Open VS Code
 2. Go to Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
