@@ -1,0 +1,28 @@
+[
+    {
+        "ruleId": "sample-global-rule-1",
+        "ruleText": "Always include error handling for async operations using try-catch blocks",
+        "scope": "global",
+        "createdAt": "2025-09-22T18:00:00.000Z",
+        "updatedAt": "2025-09-22T18:00:00.000Z",
+        "isActive": true
+    },
+    {
+        "ruleId": "sample-typescript-rule-1",
+        "ruleText": "Prefer interfaces over type aliases for object shapes to enable declaration merging",
+        "scope": "language",
+        "languageScope": "typescript",
+        "createdAt": "2025-09-22T18:00:00.000Z",
+        "updatedAt": "2025-09-22T18:00:00.000Z",
+        "isActive": true
+    },
+    {
+        "ruleId": "sample-project-rule-1",
+        "ruleText": "Use the custom Logger class instead of console.log for all logging operations",
+        "scope": "project",
+        "projectPath": "/path/to/current/project",
+        "createdAt": "2025-09-22T18:00:00.000Z",
+        "updatedAt": "2025-09-22T18:00:00.000Z",
+        "isActive": true
+    }
+]

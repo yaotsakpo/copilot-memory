@@ -1,0 +1,86 @@
+{
+  "name": "copilot-memory",
+  "displayName": "Copilot Memory",
+  "description": "A personalization layer that adds persistent rules and preferences on top of GitHub Copilot",
+  "version": "0.0.1",
+  "publisher": "copilot-memory",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/copilot-memory.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/copilot-memory/issues"
+  },
+  "homepage": "https://github.com/your-username/copilot-memory#readme",
+  "keywords": [
+    "copilot",
+    "ai",
+    "rules",
+    "personalization",
+    "coding-assistant"
+  ],
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilotMemory.addRule",
+        "title": "Add Rule",
+        "category": "Copilot Memory"
+      },
+      {
+        "command": "copilotMemory.listRules",
+        "title": "List Rules",
+        "category": "Copilot Memory"
+      },
+      {
+        "command": "copilotMemory.removeRule",
+        "title": "Remove Rule",
+        "category": "Copilot Memory"
+      }
+    ],
+    "configuration": {
+      "title": "Copilot Memory",
+      "properties": {
+        "copilotMemory.mongodbUri": {
+          "type": "string",
+          "default": "mongodb://localhost:27017/copilot-memory",
+          "description": "MongoDB connection URI"
+        },
+        "copilotMemory.fallbackToLocal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use local .copilot-memory.json if MongoDB is unavailable"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "mongoose": "^7.5.0"
+  }
+}
