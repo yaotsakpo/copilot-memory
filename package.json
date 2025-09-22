@@ -5,6 +5,7 @@
   "version": "0.0.5",
   "publisher": "yaotsakpo",
   "license": "MIT",
+  "icon": "assets/copilot-memory.png",
   "galleryBanner": {
     "color": "#1e1e1e",
     "theme": "dark"
