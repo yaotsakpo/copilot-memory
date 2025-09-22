@@ -1,36 +1,70 @@
 import * as vscode from 'vscode';
-import { RuleManager } from './ruleManager';
-import { Logger } from './utils/logger';
+import * as fs from 'fs';
+import * as path from 'path';
 
-let globalRuleManager: RuleManager | undefined;
+// Simple rule interface for local storage
+interface SimpleRule {
+    id: string;
+    text: string;
+    scope: 'global' | 'project' | 'language';
+    createdAt: string;
+}
+
+let rules: SimpleRule[] = [];
+let storageFile: string = '';
+
+// Simple storage functions
+function getStorageFile(context: vscode.ExtensionContext): string {
+    const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (workspaceRoot) {
+        return path.join(workspaceRoot, '.copilot-memory.json');
+    }
+    return path.join(context.globalStorageUri.fsPath, 'copilot-memory.json');
+}
+
+function loadRules(): void {
+    try {
+        if (fs.existsSync(storageFile)) {
+            const data = fs.readFileSync(storageFile, 'utf8');
+            rules = JSON.parse(data) || [];
+        }
+    } catch (error) {
+        rules = [];
+    }
+}
+
+function saveRules(): void {
+    try {
+        const dir = path.dirname(storageFile);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.writeFileSync(storageFile, JSON.stringify(rules, null, 2));
+    } catch (error) {
+        console.error('Failed to save rules:', error);
+    }
+}
 
 /**
  * This method is called when your extension is activated
  */
-export async function activate(context: vscode.ExtensionContext) {
-    Logger.info('Activating Copilot Memory extension...');
+export function activate(context: vscode.ExtensionContext) {
+    console.log('Activating Copilot Memory extension...');
     
     try {
-        // Register commands IMMEDIATELY - don't wait for anything
+        // Initialize storage
+        storageFile = getStorageFile(context);
+        loadRules();
+        
+        // Register commands immediately
         registerCommands(context);
         
-        // Initialize RuleManager in background
-        initializeRuleManagerAsync(context);
-        
-        Logger.info('Copilot Memory extension activated successfully');
+        console.log('Copilot Memory extension activated successfully');
         return {};
         
     } catch (error) {
-        Logger.error('Failed to activate Copilot Memory extension', error as Error);
-        
-        // Even if activation fails, try to register basic commands
-        try {
-            registerBasicCommands(context);
-        } catch (fallbackError) {
-            Logger.error('Failed to register fallback commands', fallbackError as Error);
-        }
-        
-        throw error;
+        console.error('Failed to activate Copilot Memory extension:', error);
+        vscode.window.showErrorMessage(`Failed to activate Copilot Memory: ${error}`);
     }
 }
 
@@ -55,17 +89,21 @@ function registerCommands(context: vscode.ExtensionContext): void {
                 return;
             }
             
-            // Ensure RuleManager exists
-            if (!globalRuleManager) {
-                globalRuleManager = new RuleManager(context);
-                await globalRuleManager.initialize();
-            }
+            // Add rule to simple storage
+            const newRule: SimpleRule = {
+                id: Date.now().toString(),
+                text: ruleText,
+                scope: scope as 'global' | 'project' | 'language',
+                createdAt: new Date().toISOString()
+            };
             
-            await globalRuleManager.addRule(ruleText, scope as any);
+            rules.push(newRule);
+            saveRules();
+            
             vscode.window.showInformationMessage(`Rule added successfully with ${scope} scope!`);
             
         } catch (error) {
-            Logger.error('Failed to add rule', error as Error);
+            console.error('Failed to add rule:', error);
             vscode.window.showErrorMessage(`Failed to add rule: ${error}`);
         }
     });
@@ -73,21 +111,15 @@ function registerCommands(context: vscode.ExtensionContext): void {
     // List Rules Command
     const listRulesCommand = vscode.commands.registerCommand('copilotMemory.listRules', async () => {
         try {
-            if (!globalRuleManager) {
-                vscode.window.showInformationMessage('No rules available yet. Add a rule first.');
-                return;
-            }
-            
-            const rules = await globalRuleManager.getRules();
             if (rules.length === 0) {
                 vscode.window.showInformationMessage('No rules found. Use "Add Rule" to create your first rule.');
                 return;
             }
 
             const ruleItems = rules.map(rule => ({
-                label: rule.ruleText,
+                label: rule.text,
                 description: `${rule.scope} scope`,
-                detail: `Created: ${rule.createdAt?.toLocaleDateString() || 'Unknown'}`
+                detail: `Created: ${new Date(rule.createdAt).toLocaleDateString()}`
             }));
 
             await vscode.window.showQuickPick(ruleItems, {
@@ -95,7 +127,7 @@ function registerCommands(context: vscode.ExtensionContext): void {
             });
             
         } catch (error) {
-            Logger.error('Failed to list rules', error as Error);
+            console.error('Failed to list rules:', error);
             vscode.window.showErrorMessage(`Failed to list rules: ${error}`);
         }
     });
@@ -103,21 +135,15 @@ function registerCommands(context: vscode.ExtensionContext): void {
     // Remove Rule Command
     const removeRuleCommand = vscode.commands.registerCommand('copilotMemory.removeRule', async () => {
         try {
-            if (!globalRuleManager) {
-                vscode.window.showInformationMessage('No rules available to remove.');
-                return;
-            }
-
-            const rules = await globalRuleManager.getRules();
             if (rules.length === 0) {
                 vscode.window.showInformationMessage('No rules to remove.');
                 return;
             }
 
             const ruleItems = rules.map(rule => ({
-                label: rule.ruleText,
+                label: rule.text,
                 description: `${rule.scope} scope`,
-                ruleId: rule.ruleId
+                ruleId: rule.id
             }));
 
             const selected = await vscode.window.showQuickPick(ruleItems, {
@@ -125,49 +151,25 @@ function registerCommands(context: vscode.ExtensionContext): void {
             });
 
             if (selected) {
-                await globalRuleManager.removeRule(selected.ruleId);
+                rules = rules.filter(rule => rule.id !== selected.ruleId);
+                saveRules();
                 vscode.window.showInformationMessage('Rule removed successfully!');
             }
             
         } catch (error) {
-            Logger.error('Failed to remove rule', error as Error);
+            console.error('Failed to remove rule:', error);
             vscode.window.showErrorMessage(`Failed to remove rule: ${error}`);
         }
     });
 
     // Add commands to context immediately
     context.subscriptions.push(addRuleCommand, listRulesCommand, removeRuleCommand);
-    Logger.info('Commands registered: copilotMemory.addRule, copilotMemory.listRules, copilotMemory.removeRule');
-}
-
-function registerBasicCommands(context: vscode.ExtensionContext): void {
-    const basicAddCommand = vscode.commands.registerCommand('copilotMemory.addRule', async () => {
-        vscode.window.showErrorMessage('Copilot Memory failed to initialize properly. Please restart VS Code.');
-    });
-    
-    context.subscriptions.push(basicAddCommand);
-    Logger.info('Basic fallback commands registered');
-}
-
-async function initializeRuleManagerAsync(context: vscode.ExtensionContext): Promise<void> {
-    try {
-        globalRuleManager = new RuleManager(context);
-        await globalRuleManager.initialize();
-        Logger.info('RuleManager initialized successfully');
-    } catch (error) {
-        Logger.error('RuleManager initialization failed, will create on-demand', error as Error);
-        globalRuleManager = undefined;
-    }
+    console.log('Commands registered: copilotMemory.addRule, copilotMemory.listRules, copilotMemory.removeRule');
 }
 
 /**
  * This method is called when your extension is deactivated
  */
 export function deactivate() {
-    try {
-        Logger.info('Deactivating Copilot Memory extension...');
-        // Cleanup resources if needed
-    } catch (error) {
-        Logger.error('Error during extension deactivation', error as Error);
-    }
+    console.log('Deactivating Copilot Memory extension...');
 }
