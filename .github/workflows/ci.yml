@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [18, 20]
+        node-version: [20]
 
     runs-on: ${{ matrix.os }}
 
@@ -36,7 +36,6 @@ jobs:
 
     - name: Run tests
       run: npm test
-      continue-on-error: true  # Allow failure until tests are implemented
 
     - name: Package extension
       run: npx @vscode/vsce package
