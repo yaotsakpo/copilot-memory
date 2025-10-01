@@ -2,7 +2,7 @@
   "name": "copilot-memory",
   "displayName": "Copilot Memory",
   "description": "Train GitHub Copilot to remember your coding preferences with persistent rules and personalized AI suggestions",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "yaotsakpo",
   "license": "MIT",
   "icon": "assets/copilot-memory.png",
@@ -43,7 +43,9 @@
     "onCommand:copilotMemory.listRules",
     "onCommand:copilotMemory.removeRule",
     "onCommand:copilotMemory.copyRulesForChat",
-    "onCommand:copilotMemory.autoApplyRules"
+    "onCommand:copilotMemory.autoApplyRules",
+    "onCommand:copilotMemory.improveRulesWithLLM",
+    "onCommand:copilotMemory.chatWithLLM"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -71,6 +73,16 @@
       {
         "command": "copilotMemory.autoApplyRules",
         "title": "🚀 Auto-Apply Rules to Chat",
+        "category": "Copilot Memory"
+      },
+      {
+        "command": "copilotMemory.improveRulesWithLLM",
+        "title": "🧠 Improve Rules with AI",
+        "category": "Copilot Memory"
+      },
+      {
+        "command": "copilotMemory.chatWithLLM",
+        "title": "💬 Chat with LLM About Rules",
         "category": "Copilot Memory"
       }
     ],
@@ -127,6 +139,39 @@
           "minimum": 0,
           "maximum": 10,
           "description": "Number of retry attempts for MongoDB operations (0-10)"
+        },
+        "copilotMemory.llmProvider": {
+          "type": "string",
+          "enum": ["openai", "anthropic", "gemini", "ollama", "azure-openai"],
+          "default": "openai",
+          "description": "LLM provider for AI-powered features"
+        },
+        "copilotMemory.llmApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for the selected LLM provider"
+        },
+        "copilotMemory.llmModel": {
+          "type": "string",
+          "default": "gpt-3.5-turbo",
+          "description": "Specific model to use (e.g., gpt-4, claude-3-sonnet, llama3.2:3b)"
+        },
+        "copilotMemory.ollamaEndpoint": {
+          "type": "string",
+          "default": "localhost",
+          "description": "Ollama server endpoint hostname or IP address"
+        },
+        "copilotMemory.ollamaPort": {
+          "type": "number",
+          "default": 11434,
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Ollama server port (default: 11434)"
+        },
+        "copilotMemory.enableLLMFeatures": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable AI-powered rule analysis and improvement features"
         }
       }
     }
